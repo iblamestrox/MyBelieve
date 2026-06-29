@@ -260,7 +260,7 @@
         
         <div class="btn-container">
             <button class="doodle-btn" onclick="triggerSequence()">Open gift</button>
-            <button class="doodle-btn" id="prank-btn" onmouseover="evadeCursor(event)" onclick="evadeCursor(event)">Don't open</button>
+            <button class="doodle-btn" id="prank-btn" onmouseenter="evadeCursor(event)" ontouchstart="evadeCursor(event)" onclick="evadeCursor(event)">Don't open</button>
         </div>
     </div>
 
@@ -300,7 +300,10 @@
     <script>
         // Prank Button Logic
         function evadeCursor(e) {
-            if (e) e.preventDefault(); 
+            if (e) {
+                e.preventDefault(); // Stops the standard click action
+                e.stopPropagation(); // Stops ghost clicks from hitting elements underneath
+            }
             
             const btn = document.getElementById('prank-btn');
             btn.style.position = 'fixed';
