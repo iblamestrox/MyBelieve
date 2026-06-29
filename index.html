@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Congratulations my Kana!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- GLOBAL DOODLE STYLES --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Caveat', cursive;
+            overflow: hidden; 
+            background-color: #fdf6e3;
+            touch-action: none; 
+        }
+
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .scene.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6; 
+        }
+
+        /* --- SCENE 1: TEASER --- */
+        #gift-img {
+            width: 200px;
+            max-width: 40vw;
+            transition: transform 0.2s;
+        }
+
+        .floating {
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .text-wrapper {
+            text-align: center;
+            max-width: 90%; 
+            margin: 15px 0;
+        }
+
+        .heading-doodle {
+            font-size: 3rem;
+            color: #333;
+            margin: 0 0 10px 0;
+            line-height: 1.1;
+            text-shadow: 2px 2px 0px #ffcccb;
+        }
+
+        .subtext-doodle {
+            font-size: 1.6rem;
+            color: #444;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .doodle-btn {
+            font-family: 'Caveat', cursive;
+            font-size: 1.6rem;
+            font-weight: bold;
+            padding: 8px 20px;
+            background-color: white;
+            color: #333;
+            border: 3px solid #333;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 0px #333;
+            z-index: 20;
+        }
+
+        .doodle-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #333;
+            background-color: #ffe4e1;
+        }
+
+        .doodle-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #333;
+        }
+
+        #prank-btn {
+            transition: left 0.2s ease, top 0.2s ease;
+        }
+
+        /* --- SOFT BUBBLE BURST TRANSITION --- */
+        #burst-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1px;
+            height: 1px;
+            background-color: #ffcccb;
+            border-radius: 50%;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1), opacity 0.4s ease-in-out;
+        }
+
+        .burst-active {
+            opacity: 1 !important;
+            transform: translate(-50%, -50%) scale(3000) !important;
+        }
+
+        /* --- SCENE 2: ENVELOPE --- */
+        .envelope-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: transform 0.2s;
+        }
+
+        .envelope-container:active {
+            transform: scale(0.95);
+        }
+
+        #envelope-img {
+            width: 250px;
+            max-width: 50vw;
+            transition: transform 0.2s;
+        }
+
+        /* --- SCENE 3: REVEAL (LETTER) --- */
+        .letter-container {
+            background: #fff;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%; 
+            max-height: 75vh;
+            overflow-y: auto;
+            border: 4px solid #333;
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px; 
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+            z-index: 5;
+            text-align: center;
+            font-size: 1.6rem;
+            line-height: 1.3;
+            color: #222;
+            touch-action: pan-y; 
+        }
+
+        .letter-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .letter-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+            border-left: 2px solid #333;
+        }
+        .letter-container::-webkit-scrollbar-thumb {
+            background: #ffcccb;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+
+        .letter-container h2 {
+            margin-top: 0;
+            font-size: 2.2rem;
+            color: #0984e3; 
+        }
+
+        .letter-container p {
+            margin-bottom: 15px;
+        }
+
+        /* --- CONFETTI --- */
+        .confetti-particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Mobile specific font sizing */
+        @media (max-width: 768px) {
+            .heading-doodle {
+                font-size: 2.2rem;
+            }
+            .subtext-doodle {
+                font-size: 1.3rem;
+            }
+            .letter-container {
+                padding: 20px;
+                font-size: 1.3rem;
+            }
+            .letter-container h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="scene1" class="scene active">
+        <picture>
+            <source media="(max-width: 768px)" srcset="pbg-1.png">
+            <img src="bg-1.png" class="bg-img" alt="" onerror="this.style.display='none'">
+        </picture>
+        
+        <img src="gift-closed.png" id="gift-img" class="floating" alt="Gift Box">
+        
+        <div class="text-wrapper">
+            <h1 class="heading-doodle">Congratulations my Kana, for achieving Rank 2!</h1>
+            <p class="subtext-doodle">I'm so incredibly proud of you. I know how much effort you put into this, and seeing it pay off is just amazing. I got you a little something to celebrate. I really hope you love it! ❤️</p>
+        </div>
+        
+        <div class="btn-container">
+            <button class="doodle-btn" onclick="triggerSequence()">Open gift</button>
+            <button class="doodle-btn" id="prank-btn" onmouseover="evadeCursor(event)" onclick="evadeCursor(event)">Don't open</button>
+        </div>
+    </div>
+
+    <div id="burst-container"></div>
+
+    <div id="scene2" class="scene">
+        <picture>
+            <source media="(max-width: 768px)" srcset="pbg-2.png">
+            <img src="bg-2.png" class="bg-img" alt="" onerror="this.style.display='none'">
+        </picture>
+
+        <div class="envelope-container" onclick="openEnvelope()">
+            <img src="ev-1.png" id="envelope-img" class="floating" alt="Closed Envelope">
+            <h2 class="heading-doodle" style="margin-top: 20px; font-size: 2.5rem;">Touch it to open</h2>
+        </div>
+    </div>
+
+    <div id="scene3" class="scene">
+        <picture>
+            <source media="(max-width: 768px)" srcset="pbg-2.png">
+            <img src="bg-2.png" class="bg-img" alt="" onerror="this.style.display='none'">
+        </picture>
+        
+        <div class="letter-container">
+            <h2>To the most brilliant girl I know—Celebrating your Rank 2! 🏆</h2>
+            <p>I know how much effort you put into this, and seeing it pay off is just amazing. I got you a little something to celebrate. I really hope you love it! ❤️</p>
+            <p>Watching you work so hard and pour so much dedication into your studies has been truly inspiring. I want you to know that you will always have my unwavering support in everything you do.</p>
+            <p>I am rooting for you every single day, and I can honestly say I am proud of you like no one else in this world could ever be.</p>
+            <p>As you step into your last grade, I hope you use this incredible achievement as motivation to finish strong—you have such a beautiful mind.</p>
+            <p>I am also sending you all my luck and belief for your upcoming UTBK exam. I know you are going to completely crush it and succeed.</p>
+            <p>Just keep believing in yourself the exact same way I believe in you.</p>
+            <p><em>The moon is beautiful, isn't it?</em></p>
+            <p><strong>- someone who cares about you from a thousand miles away.</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // Prank Button Logic
+        function evadeCursor(e) {
+            if (e) e.preventDefault(); 
+            
+            const btn = document.getElementById('prank-btn');
+            btn.style.position = 'fixed';
+            
+            const maxX = window.innerWidth - btn.offsetWidth - 20;
+            const maxY = window.innerHeight - btn.offsetHeight - 20;
+            
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+            
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+        }
+
+        // Scene 1 to Scene 2 (Gift to Envelope)
+        function triggerSequence() {
+            const giftImg = document.getElementById('gift-img');
+            giftImg.src = 'gift-opened.png';
+            giftImg.classList.remove('floating');
+
+            setTimeout(() => {
+                const burst = document.getElementById('burst-container');
+                burst.classList.add('burst-active');
+                
+                setTimeout(() => {
+                    document.getElementById('scene1').classList.remove('active');
+                    document.getElementById('scene2').classList.add('active'); // Reveal Envelope
+                    
+                    burst.style.opacity = '0';
+
+                    setTimeout(() => {
+                        burst.classList.remove('burst-active');
+                        burst.style.opacity = '0';
+                    }, 600);
+
+                }, 500); 
+
+            }, 300);
+        }
+
+        // Scene 2 to Scene 3 (Envelope to Letter)
+        function openEnvelope() {
+            const envImg = document.getElementById('envelope-img');
+            // Change to open envelope image
+            envImg.src = 'ev-2.png';
+            envImg.classList.remove('floating');
+
+            // Wait a split second to register the open image, then fade to the letter
+            setTimeout(() => {
+                document.getElementById('scene2').classList.remove('active');
+                document.getElementById('scene3').classList.add('active'); // Reveal Letter
+                
+                // Fire confetti once the letter starts showing
+                setTimeout(() => {
+                    fireConfetti();
+                }, 200);
+
+            }, 600);
+        }
+
+        // Confetti Logic
+        function fireConfetti() {
+            const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+            
+            createConfettiCannon(0, window.innerHeight, 1);
+            createConfettiCannon(window.innerWidth, window.innerHeight, -1);
+
+            function createConfettiCannon(startX, startY, direction) {
+                for(let i = 0; i < 60; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('confetti-particle');
+                    document.body.appendChild(particle);
+                    
+                    particle.style.left = startX + 'px';
+                    particle.style.top = startY + 'px';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    const distanceX = direction * (100 + Math.random() * 500);
+                    const distanceY = -(300 + Math.random() * 600);
+                    const rotation = Math.random() * 720;
+                    
+                    particle.animate([
+                        { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                        { transform: `translate(${distanceX}px, ${distanceY}px) rotate(${rotation}deg)`, opacity: 1, offset: 0.5 },
+                        { transform: `translate(${distanceX + (direction * 50)}px, 100vh) rotate(${rotation * 2}deg)`, opacity: 0 }
+                    ], {
+                        duration: 3000 + Math.random() * 1500,
+                        easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                        fill: 'forwards'
+                    });
+
+                    setTimeout(() => particle.remove(), 4500);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
